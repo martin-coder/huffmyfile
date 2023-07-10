@@ -1,9 +1,9 @@
 package main
 
 func main() {
-	infile := "input.txt"
-	outfile := "output.txt"
-	dfile := "decoded.txt"
+	infile := "mobydick.txt"
+	outfile := "mobydick_huffed.txt"
+	dfile := "mobydick_unhuffed.txt"
 
 	//Create Encoder and use to write encoded output file
 	e := Encoder{}

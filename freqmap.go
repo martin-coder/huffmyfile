@@ -12,7 +12,7 @@ type FreqMap struct {
 	fmap map[int]int
 }
 
-func makeFreqMap(infile string) map[int]int {
+func makeFrequencyMap(infile string) map[int]int {
 	m := make(map[int]int)
 
 	//Open input file

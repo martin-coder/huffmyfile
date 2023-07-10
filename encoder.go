@@ -12,80 +12,80 @@ import (
 )
 
 type Encoder struct {
-	freqMap    map[int]int
-	codeMap    map[int]string
-	revCodeMap map[string]int
+	frequencyMap   map[int]int
+	codeMap        map[int]string
+	reverseCodeMap map[string]int
 }
 
-func (e *Encoder) Encode(infile, outfile string) {
+func (e *Encoder) Encode(inputFileName, outputFileName string) {
 	//Open input file
-	inf, err := os.Open(infile)
+	inputFile, err := os.Open(inputFileName)
 	check(err)
-	//close inf on exit & check for its returned error
+	//close inputFile on exit & check for its returned error
 	defer func() {
-		if err := inf.Close(); err != nil {
+		if err := inputFile.Close(); err != nil {
 			panic(err)
 		}
 	}()
 
 	//Open output file
-	outf, err := os.Create(outfile)
+	outputFile, err := os.Create(outputFileName)
 	check(err)
-	//close outf on exit
-	defer outf.Close()
+	//close outputFile on exit
+	defer outputFile.Close()
 
 	//Create Reader & Writer
-	r := bufio.NewReader(inf)
-	w := bufio.NewWriter(outf)
+	reader := bufio.NewReader(inputFile)
+	writer := bufio.NewWriter(outputFile)
 
 	//Generate Frequency Map
-	fmap := makeFreqMap(infile)
-	fmt.Println("\nFrequency Map: ", fmap)
+	frequencyMap := makeFrequencyMap(inputFileName)
+	fmt.Println("\nFrequency Map: ", frequencyMap)
 
 	//Generate Huffman Tree using frequency map
-	h := huffmantree.HuffTree{}
-	h.MakeHuffmanTree(fmap)
+	huffmanTree := huffmantree.HuffTree{}
+	huffmanTree.MakeHuffmanTree(frequencyMap)
 	fmt.Println()
 	fmt.Print("Tree: ")
-	h.Print()
+	huffmanTree.Print()
 	fmt.Println()
 
 	//Generate Code Map from Huffman Tree
-	cmap := h.CodeMap()
+	codeMap := huffmanTree.CodeMap()
 
 	//Set instance variables to generated maps
-	e.codeMap = cmap
-	e.freqMap = fmap
+	e.codeMap = codeMap
+	e.frequencyMap = frequencyMap
 
 	//Write code table to output file as first line
 	for k, v := range e.codeMap {
-		_, err := w.WriteString(fmt.Sprint(k) + " " + v + " ")
+		_, err := writer.WriteString(fmt.Sprint(k) + " " + v + " ")
 		check(err)
 	}
-	_, err = w.WriteString("\n")
+	_, err = writer.WriteString("\n")
 	check(err)
-	w.Flush()
+	writer.Flush()
 
 	//Write encoded body of file to output file
 	for {
-		if c, _, err := r.ReadRune(); err != nil {
+		if c, _, err := reader.ReadRune(); err != nil {
 			if err == io.EOF {
 				break
 			} else {
 				log.Fatal(err)
 			}
 		} else {
-			w.WriteString(e.codeMap[int(c)])
+			writer.WriteString(e.codeMap[int(c)])
 		}
 	}
-	w.Flush()
+	writer.Flush()
 }
 
 func (e *Encoder) Decode(enfile, dfile string) {
 	//Open encoded file
 	enf, err := os.Open(enfile)
 	check(err)
-	//close inf on exit & check for its returned error
+	//close inputFile on exit & check for its returned error
 	defer func() {
 		if err := enf.Close(); err != nil {
 			panic(err)
@@ -95,7 +95,7 @@ func (e *Encoder) Decode(enfile, dfile string) {
 	//Open output file
 	df, err := os.Create(dfile)
 	check(err)
-	//close outf on exit
+	//close outputFile on exit
 	defer df.Close()
 
 	//Create Reader & Writer
@@ -124,7 +124,7 @@ func (e *Encoder) Decode(enfile, dfile string) {
 	fmt.Println("\nNew Code Map: ", e.codeMap)
 
 	//Create Reversed Code Map for reverse lookups
-	e.revCodeMap = reverseMap(e.codeMap)
+	e.reverseCodeMap = reverseMap(e.codeMap)
 	fmt.Println("\nRev Code Map: ", reverseMap(e.codeMap))
 	fmt.Println()
 
@@ -144,7 +144,7 @@ func (e *Encoder) Decode(enfile, dfile string) {
 			}
 		} else {
 			sb.WriteRune(c)
-			if asciiVal, exists := e.revCodeMap[sb.String()]; exists {
+			if asciiVal, exists := e.reverseCodeMap[sb.String()]; exists {
 				w.WriteString(string(rune(asciiVal)))
 				sb.Reset()
 				w.Flush()
