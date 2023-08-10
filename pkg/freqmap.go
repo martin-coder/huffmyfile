@@ -1,4 +1,8 @@
-package main
+/*
+* Tracks the frequency of each character in the input text
+ */
+
+package huffmyfile
 
 import (
 	"bufio"
@@ -7,17 +11,16 @@ import (
 	"os"
 )
 
-//Tracks the frequency of each character in the input text
-type FreqMap struct {
-	fmap map[int]int
-}
+const pseudoEOF = int(^uint(0) >> 1) // MaxInt
 
 func makeFrequencyMap(infile string) map[int]int {
 	m := make(map[int]int)
 
 	//Open input file
 	inf, err := os.Open(infile)
-	check(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 	//close inf on exit & check for its returned error
 	defer func() {
 		if err := inf.Close(); err != nil {
@@ -40,6 +43,9 @@ func makeFrequencyMap(infile string) map[int]int {
 			m[int(c)] += 1
 		}
 	}
+
+	//Add a pseudo-EOF character to aid in decompression (MaxInt)
+	m[pseudoEOF] = 1
 
 	return m
 }

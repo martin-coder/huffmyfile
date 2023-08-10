@@ -1,4 +1,4 @@
-package huffmantree
+package huffmyfile
 
 import (
 	"container/heap"
@@ -125,5 +125,4 @@ func printRec(n *HuffNode) {
 	if n.right != nil {
 		printRec(n.right)
 	}
-	return
 }

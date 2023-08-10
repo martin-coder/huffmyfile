@@ -1,7 +1,6 @@
-package huffmantree
+package huffmyfile
 
 import (
-	"container/heap"
 	"fmt"
 )
 
@@ -47,10 +46,10 @@ func (pq *PriorityQueue) Pop() any {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (pq *PriorityQueue) update(htw *HTWrapper, ht *HuffTree) {
-	htw.ht = ht
-	heap.Fix(pq, htw.index)
-}
+// func (pq *PriorityQueue) update(htw *HTWrapper, ht *HuffTree) {
+// 	htw.ht = ht
+// 	heap.Fix(pq, htw.index)
+// }
 
 //Prints an array representation of the priority queue's contents
 func (pq *PriorityQueue) Print() {

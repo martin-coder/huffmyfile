@@ -1,2 +1,2 @@
-# huff-my-file
+# huffmyfile
 A CLI compression tool using Huffman Coding written in Golang
