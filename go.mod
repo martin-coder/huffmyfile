@@ -1,4 +1,4 @@
-module huffmyfile
+module github.com/martin-coder/huffmyfile
 
 go 1.18
 

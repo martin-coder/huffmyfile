@@ -6,7 +6,8 @@ package cmd
 
 import (
 	"fmt"
-	huffmyfile "huffmyfile/pkg"
+
+	huffmyfile "github.com/martin-coder/huffmyfile/pkg"
 
 	"github.com/spf13/cobra"
 )
