@@ -1,4 +1,4 @@
-# huffmyfile
+# HuffMyFile
 
 A CLI tool written in Go to compress and decompress text files!
 
@@ -33,7 +33,7 @@ $ huffmyfile unhuff [FILE]
 
 ## Description
 
-Huffmyfile is a command-line tool written in Go that enables you to losslessly compress and decompress text files using Huffman coding. This tool is designed to reduce the size of text files by efficiently encoding characters based on their frequency in the input text.
+HuffMyFile is a command-line tool written in Go that enables you to losslessly compress and decompress text files using Huffman coding. This tool is designed to reduce the size of text files by efficiently encoding characters based on their frequency in the input text.
 
 ### What is Huffman coding?
 Huffman coding is a popular algorithm used in data compression to encode data, particularly text, in a way that reduces its size while ensuring that no information is lost. It's a variable-length prefix coding technique developed by David A. Huffman in 1952 while he was a Ph.D. student at MIT. The primary idea behind Huffman coding is to assign shorter codes to more frequently occurring symbols and longer codes to less frequent symbols, resulting in an efficient representation of the data.
