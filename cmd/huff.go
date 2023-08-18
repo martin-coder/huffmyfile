@@ -1,12 +1,14 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Martin Coder <martincoder1@gmail.com>
 
+Use of this source code is governed by an MIT-style
+license that can be found in the LICENSE file or at
+https://opensource.org/licenses/MIT.
 */
+
 package cmd
 
 import (
-	"fmt"
-
 	huffmyfile "github.com/martin-coder/huffmyfile/pkg"
 
 	"github.com/spf13/cobra"
@@ -23,7 +25,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("huff called")
+		// fmt.Println("huff called")
 		e := huffmyfile.Encoder{}
 		e.EncodeToDefaultOutputFile(args[0])
 	},

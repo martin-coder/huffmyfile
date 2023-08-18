@@ -1,3 +1,11 @@
+/*
+Copyright © 2023 Martin Coder <martincoder1@gmail.com>
+
+Use of this source code is governed by an MIT-style
+license that can be found in the LICENSE file or at
+https://opensource.org/licenses/MIT.
+*/
+
 package huffmyfile
 
 import (
@@ -26,7 +34,7 @@ func (a *HuffTree) MakeHuffmanTree(freqMap map[int]int) {
 		heap.Push(&pq, &htw)
 	}
 
-	fmt.Print("\nIndividual trees, prior to consolidation: ")
+	// fmt.Print("\nIndividual trees, prior to consolidation: ")
 	pq.Println()
 
 	//Removes two smallest (lowest total frequency) trees, combines them, pushes it back onto queue.

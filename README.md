@@ -66,24 +66,26 @@ A:5
 ```
 3. Build the Huffman tree:
 ```
-          12
-         /  \
-        A:5  7
+      11
+     /  \
+    A:5  6
+        / \
+      R:2  4
+          / \
+        B:2  2         
             / \
-           B:2 R:2
-           / \
           C:1 D:1
 ```
-4. Assign codes by traversing the tree:
+4. Assign codes by traversing the tree, adding a 0 for each left, and a 1 for each right:
 ```
 A: 0
-B: 10
-R: 110
+R: 10
+B: 110
 C: 1110
 D: 1111
 ```
 The compressed representation of "ABRACADABRA" using Huffman coding is:
-`010011001001110010011011`
+`01101001110011110110100`
 
 ## Limitations
 
