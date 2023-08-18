@@ -94,9 +94,7 @@ Large text files might consume substantial memory during compression and decompr
 
 ### Contributors names and contact info
 
-**Martin Coder**
-* [linkedin.com/in/martin-coder](https://www.linkedin.com/in/martin-coder)
-* [martincoder1@gmail.com](mailto:martincoder1@gmail.com)
+**Martin Coder** - [linkedin.com/in/martin-coder](https://www.linkedin.com/in/martin-coder) - [martincoder1@gmail.com](mailto:martincoder1@gmail.com)
 
 ## Version History
 
@@ -110,3 +108,7 @@ Contributions are welcome! If you encounter any issues or have suggestions for i
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details
+
+## Acknowledgments
+
+
