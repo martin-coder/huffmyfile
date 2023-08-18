@@ -26,3 +26,7 @@ go.work
 
 # VS Code Launch Files
 *.vscode
+
+# DS_Store
+**/.DS_Store
+
