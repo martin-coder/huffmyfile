@@ -35,7 +35,7 @@ func (a *HuffTree) MakeHuffmanTree(freqMap map[int]int) {
 	}
 
 	// fmt.Print("\nIndividual trees, prior to consolidation: ")
-	pq.Println()
+	// pq.Println()
 
 	//Removes two smallest (lowest total frequency) trees, combines them, pushes it back onto queue.
 	//Repeats until there is one large Huffman tree with each character as a leaf.

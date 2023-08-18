@@ -17,16 +17,8 @@ import (
 // unhuffCmd represents the unhuff command
 var unhuffCmd = &cobra.Command{
 	Use:   "unhuff",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Decompresses .huff files into .txt files. Usage: `huffmyfile unhuff [FILE]`",
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("unhuff called")
-
 		e := huffmyfile.Encoder{}
 		e.DecodeToDefaultOutputFile(args[0])
 	},
