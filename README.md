@@ -111,6 +111,4 @@ Contributions are welcome! If you encounter any issues or have suggestions for i
 
 This project is licensed under the MIT License - see the LICENSE.md file for details
 
-## Acknowledgments
-
 
