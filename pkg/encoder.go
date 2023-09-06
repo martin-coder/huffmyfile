@@ -17,8 +17,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-
-	"github.com/32bitkid/bitreader"
 )
 
 type Encoder struct {
@@ -172,7 +170,7 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 
 	//Create Reader & Writer
 	reader := bufio.NewReader(encodedFile)
-	bitReader := bitreader.NewReader(reader)
+	bitReader := NewBitReader(reader)
 	writer := bufio.NewWriter(decodedFile)
 
 	//Generate Code Map from printed code table on encoded file
@@ -201,8 +199,6 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 
 	//Create Reversed Code Map for reverse lookups
 	e.reverseCodeMap = reverseMap(e.codeMap)
-	fmt.Println("\nRev Code Map: ", reverseMap(e.codeMap))
-	fmt.Println()
 
 	/*
 	*	Print encoded body to file:
@@ -225,7 +221,7 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 	reader.ReadString('\n') //Skip code table printed at top of encoded file
 	for {
 
-		if b, err := bitReader.Read1(); err != nil {
+		if b, err := bitReader.ReadBit(); err != nil {
 			if err != io.EOF {
 				log.Fatal(err)
 			}

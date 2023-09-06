@@ -19,7 +19,6 @@ var huffCmd = &cobra.Command{
 	Use:   "huff",
 	Short: "Compresses .txt files into .huff files. Usage: `huffmyfile huff [FILE]`",
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("huff called")
 		e := huffmyfile.Encoder{}
 		e.EncodeToDefaultOutputFile(args[0])
 	},
