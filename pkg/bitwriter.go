@@ -24,6 +24,9 @@ func NewBitWriter(writer io.Writer) *BitWriter {
 	}
 }
 
+/* WriteBit(): Sets bits into a buffer byte one at a time. When the byte is full (8 bits
+*	have been entered), the accumulated byte is written to the underlying writer.
+ */
 func (bw *BitWriter) WriteBit(bit bool) error {
 	if bit {
 		bw.buffer |= 1 << (7 - bw.offset) // Set the bit in the buffer
@@ -45,6 +48,8 @@ func (bw *BitWriter) WriteBit(bit bool) error {
 	return nil
 }
 
+/* Flush(): Writes whatever bits are left to the underlying writer.
+ */
 func (bw *BitWriter) Flush() error {
 	if bw.offset > 0 {
 		// Write the remaining bits to the underlying writer

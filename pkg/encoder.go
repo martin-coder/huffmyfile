@@ -25,6 +25,10 @@ type Encoder struct {
 	reverseCodeMap map[string]int
 }
 
+/* EncodeToDefaultOutputFile():
+* Wrapper for Encode() so an output file name doesn't need to be specified.
+* Creates an output file name based on the input file name.
+ */
 func (e *Encoder) EncodeToDefaultOutputFile(inputFileName string) {
 
 	extension := path.Ext(inputFileName)
@@ -32,17 +36,15 @@ func (e *Encoder) EncodeToDefaultOutputFile(inputFileName string) {
 	outputFileName := nameWithoutExtension + ".huff"
 
 	Encode(inputFileName, outputFileName, e)
-
 }
 
+/* Encode(): Encodes a text file to a .huff file. */
 func Encode(inputFileName, outputFileName string, e *Encoder) {
 	//Open input file
 	inputFile, err := os.Open(inputFileName)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
-
 	//close inputFile on exit & check for its returned error
 	defer func() {
 		if err := inputFile.Close(); err != nil {
@@ -56,7 +58,11 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 		log.Fatal(err)
 	}
 	//close outputFile on exit
-	defer outputFile.Close()
+	defer func() {
+		if err := outputFile.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	//Create Reader & Writer
 	reader := bufio.NewReader(inputFile)
@@ -112,18 +118,14 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 	WriteEncodedRune(code, bitWriter)
 	bodyLength += len(code)
 
-	// Fill remaining zeroes in byte
-	for i := 0; i < 8-bodyLength%8; i++ {
-		bitWriter.WriteBit(false)
-	}
-
-	// Write zero byte to end of file to prevent io.UnexpectedEOF error
-	// writer.WriteByte(0)
-	// writer.WriteByte(0)
-
+	// Flush the writers
+	bitWriter.Flush()
 	writer.Flush()
 }
 
+/* WriteEncodedRune(): Writes the binary encoding of each rune to the compressed file using
+* the BitWriter.
+ */
 func WriteEncodedRune(code string, bitWriter *BitWriter) {
 	for i := 0; i < len(code); i++ {
 		if code[i] == '1' {
@@ -134,6 +136,10 @@ func WriteEncodedRune(code string, bitWriter *BitWriter) {
 	}
 }
 
+/* DecodeToDefaultOutputFile():
+* Wrapper function for Decode(). Allows for decoding without specifying an
+* output file. Creates an output file based on the name for the input file.
+ */
 func (e *Encoder) DecodeToDefaultOutputFile(inputFileName string) {
 
 	extension := path.Ext(inputFileName)
@@ -147,33 +153,40 @@ func (e *Encoder) DecodeToDefaultOutputFile(inputFileName string) {
 
 }
 
+/* Decode(): Takes an encoded .huff file, decodes and writes decoded text to
+* an output file.
+ */
 func Decode(inputFileName, outputFileName string, e *Encoder) {
-	//Open encoded file
+	//	Open encoded file
 	encodedFile, err := os.Open(inputFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//close inputFile on exit & check for its returned error
+	//	Close inputFile on exit & check for its returned error
 	defer func() {
 		if err := encodedFile.Close(); err != nil {
 			panic(err)
 		}
 	}()
 
-	//Open output file
+	//	Open output file
 	decodedFile, err := os.Create(outputFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//close outputFile on exit
-	defer decodedFile.Close()
+	//	Close outputFile on exit
+	defer func() {
+		if err := decodedFile.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
-	//Create Reader & Writer
+	//	Create Reader & Writer
 	reader := bufio.NewReader(encodedFile)
 	bitReader := NewBitReader(reader)
 	writer := bufio.NewWriter(decodedFile)
 
-	//Generate Code Map from printed code table on encoded file
+	//	Generate Code Map from printed code table on encoded file
 	e.codeMap = make(map[int]string)
 	scanner := bufio.NewScanner(encodedFile)
 	scanner.Scan()
@@ -195,30 +208,22 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 		last = word
 	}
 
-	fmt.Println("\nNew Code Map: ", e.codeMap)
-
-	//Create Reversed Code Map for reverse lookups
+	//	Create Reversed Code Map for reverse lookups
 	e.reverseCodeMap = reverseMap(e.codeMap)
 
-	/*
-	*	Print encoded body to file:
-	*	Read each bit
-	*	Append it to a string
-	*	Check if it matches a key in the codemap
-	*	If not, start again with the next bit
-	*	If it does, write that character to the decoded file, reset the string, then start again
-	 */
-
-	var code string
-
-	//Reset file cursor to beginning of file
+	//	Reset file cursor to beginning of file
 	_, err = encodedFile.Seek(0, io.SeekStart)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	//	Skip code table printed at top of encoded file
-	reader.ReadString('\n') //Skip code table printed at top of encoded file
+	reader.ReadString('\n')
+
+	//	Read encoded file one bit at a time until a sequence of bits matches a code
+	//	in the code table. Once it does, write the corresponding rune to the
+	//	decoded .txt file and start again. This is done until EOF is reached.
+	var code string
 	for {
 
 		if b, err := bitReader.ReadBit(); err != nil {
@@ -245,6 +250,7 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 
 }
 
+/* reverseMap(): Takes a map, returns the same map but in reverse. */
 func reverseMap(m map[int]string) map[string]int {
 	n := make(map[string]int, len(m))
 	for k, v := range m {

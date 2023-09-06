@@ -15,8 +15,8 @@ import (
 
 type BitReader struct {
 	reader   io.Reader // Underlying reader
-	buffer   byte
-	bitCount uint8
+	buffer   byte      // Buffer to read individual bits from
+	bitCount uint8     // Keeping track of what bits have been read
 	err      error
 }
 
@@ -29,6 +29,9 @@ func NewBitReader(reader io.Reader) *BitReader {
 	}
 }
 
+/*
+*	ReadBit(): Wrapper function for readBit() to return a bool rather than uint8
+ */
 func (br *BitReader) ReadBit() (bit bool, err error) {
 	if br.err != nil {
 		return false, br.err
@@ -46,6 +49,10 @@ func (br *BitReader) ReadBit() (bit bool, err error) {
 	}
 
 }
+
+/*	readBit(): Reads the next bit from the buffer. Reads a new byte to the buffer when
+*	bitCount reaches 0.
+ */
 func (br *BitReader) readBit() (bit uint8, err error) {
 	if br.err != nil {
 		return 0, br.err
@@ -64,6 +71,9 @@ func (br *BitReader) readBit() (bit uint8, err error) {
 	return bit, nil
 }
 
+/*	ReadByte(): Wrapper function for readByte(). Throws an error if ReadByte() is called
+*	while the buffer is still full.
+ */
 func (br *BitReader) ReadByte() (b byte, err error) {
 	if br.err != nil {
 		return 0, br.err
@@ -76,6 +86,9 @@ func (br *BitReader) ReadByte() (b byte, err error) {
 	return br.readByte()
 }
 
+/*	readByte(): Uses the underlying reader to read a single byte into a buffer, then
+*	returns that byte.
+ */
 func (br *BitReader) readByte() (b byte, err error) {
 	buff := make([]byte, 1)
 	_, err = br.reader.Read(buff)

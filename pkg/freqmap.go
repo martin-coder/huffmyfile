@@ -19,8 +19,13 @@ import (
 	"os"
 )
 
+//	Note: a pseudoEOF is used to indicate the end of the encoded file. MaxInt is used
+//	to represent this pseudoEOF as it would never be used to represent a different character.
 const pseudoEOF = int(^uint(0) >> 1) // MaxInt
 
+/* makeFrequencyMap(): Reads the input file and counts the frequency of each character.
+* Returns a map of each character and their respective frequency in the file.
+ */
 func makeFrequencyMap(infile string) map[int]int {
 	m := make(map[int]int)
 
