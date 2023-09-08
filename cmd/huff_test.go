@@ -41,6 +41,22 @@ func TestHuff(t *testing.T) {
 		t.Errorf("Test Case 2 failed. Input file not equal to decoded file.")
 	}
 
+	// Remove test files
+	err = os.Remove(testFileName)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	err = os.Remove(compressedTestFileName)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	err = os.Remove(decodedTestFileName)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 }
 
 const chunkSize = 64000

@@ -10,6 +10,7 @@ package huffmyfile
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -39,7 +40,7 @@ func (e *Encoder) EncodeToDefaultOutputFile(inputFileName string) {
 }
 
 /* Encode(): Encodes a text file to a .huff file. */
-func Encode(inputFileName, outputFileName string, e *Encoder) {
+func Encode(inputFileName, compressedFileName string, e *Encoder) {
 	//Open input file
 	inputFile, err := os.Open(inputFileName)
 	if err != nil {
@@ -53,7 +54,7 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 	}()
 
 	//Open output file
-	outputFile, err := os.Create(outputFileName)
+	outputFile, err := os.Create(compressedFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -132,12 +133,21 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 	writer.Flush()
 
 	println("Compression complete.")
+
+	compressionRatio, err := GetCompressionRatio(inputFileName, compressedFileName)
+
+	if err != nil {
+		println(err.Error())
+	}
+
+	fmt.Printf("File compressed by %.2f%%\n", (1.0-compressionRatio)*100)
+
 }
 
 /* GetCompressionRatio(): Compares the sizes of the original and the compressed
 * files, returns the ratio as a float64.
  */
-func GetCompressionRatio(originalFileName, compressedFileName string) float64 {
+func GetCompressionRatio(originalFileName, compressedFileName string) (float64, error) {
 	oFile, err := os.Open(originalFileName)
 	if err != nil {
 		log.Fatal(err)
@@ -157,11 +167,17 @@ func GetCompressionRatio(originalFileName, compressedFileName string) float64 {
 	}
 
 	oFileSize := oFileInfo.Size()
+	fmt.Printf("Original File Size: %.2f\n", float64(oFileSize))
 	cFileSize := cFileInfo.Size()
+	fmt.Printf("Compressed File Size: %.2f\n", float64(cFileSize))
 
-	compressionRatio := float64(oFileSize) / float64(cFileSize)
+	compressionRatio := float64(cFileSize) / float64(oFileSize)
 
-	return compressionRatio
+	if compressionRatio > 1 {
+		err = errors.New("ERROR: Compressed file larger than original, possibly due to small input file size")
+	}
+
+	return compressionRatio, err
 }
 
 /* WriteEncodedRune(): Writes the binary encoding of each rune to the compressed file using
