@@ -58,7 +58,9 @@ func makeFrequencyMap(infile string) map[int]int {
 	}
 
 	//Add a pseudo-EOF character to aid in decompression (MaxInt)
-	m[pseudoEOF] = 1
+	if len(m) != 0 {
+		m[pseudoEOF] = 1
+	}
 
 	return m
 }

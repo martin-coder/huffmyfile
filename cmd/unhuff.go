@@ -24,6 +24,17 @@ var unhuffCmd = &cobra.Command{
 	},
 }
 
+// Wrapper function to return an unhuff command for testing
+func NewUnhuffCmd(CompressedTestFileName string) *cobra.Command {
+	return &cobra.Command{
+		Use:   "unhuff",
+		Short: "Decompresses .huff files into .txt files. Usage: `huffmyfile unhuff [FILE]`",
+		Run: func(cmd *cobra.Command, args []string) {
+			e := huffmyfile.Encoder{}
+			e.DecodeToDefaultOutputFile(CompressedTestFileName)
+		},
+	}
+}
 func init() {
 	rootCmd.AddCommand(unhuffCmd)
 

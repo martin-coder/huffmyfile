@@ -24,6 +24,18 @@ var huffCmd = &cobra.Command{
 	},
 }
 
+// Function to return huff command for testing
+func NewHuffCmd(testFileName string) *cobra.Command {
+	return &cobra.Command{
+		Use:   "huff",
+		Short: "Compresses .txt files into .huff files. Usage: `huffmyfile huff [FILE]`",
+		Run: func(cmd *cobra.Command, args []string) {
+			e := huffmyfile.Encoder{}
+			e.EncodeToDefaultOutputFile(testFileName)
+		},
+	}
+}
+
 func init() {
 	rootCmd.AddCommand(huffCmd)
 

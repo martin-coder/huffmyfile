@@ -70,9 +70,17 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 	bitWriter := NewBitWriter(outputFile)
 
 	//Generate Frequency Map
+	println("Building frequency map...")
 	frequencyMap := makeFrequencyMap(inputFileName)
 
+	//Stop encoding if input file is empty
+	if len(frequencyMap) == 0 {
+		println("Input is empty.")
+		println("Encoding complete.")
+		return
+	}
 	//Generate Huffman Tree using frequency map
+	println("Generating Huffman tree...")
 	huffmanTree := HuffTree{}
 	huffmanTree.MakeHuffmanTree(frequencyMap)
 
@@ -84,6 +92,7 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 	e.frequencyMap = frequencyMap
 
 	//Write code table to output file as first line
+	println("Writing to file...")
 	for k, v := range e.codeMap {
 		_, err := writer.WriteString(fmt.Sprint(k) + " " + v + " ")
 		if err != nil {
@@ -109,24 +118,56 @@ func Encode(inputFileName, outputFileName string, e *Encoder) {
 			}
 		} else {
 			code := e.codeMap[int(c)]
-			WriteEncodedRune(code, bitWriter)
+			writeEncodedRune(code, bitWriter)
 			bodyLength += len(code)
 		}
 	}
 	// Write pseudo-EOF to end of file
 	code := e.codeMap[pseudoEOF]
-	WriteEncodedRune(code, bitWriter)
+	writeEncodedRune(code, bitWriter)
 	bodyLength += len(code)
 
 	// Flush the writers
 	bitWriter.Flush()
 	writer.Flush()
+
+	println("Compression complete.")
+}
+
+/* GetCompressionRatio(): Compares the sizes of the original and the compressed
+* files, returns the ratio as a float64.
+ */
+func GetCompressionRatio(originalFileName, compressedFileName string) float64 {
+	oFile, err := os.Open(originalFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	oFileInfo, err := oFile.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cFile, err := os.Open(compressedFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cFileInfo, err := cFile.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	oFileSize := oFileInfo.Size()
+	cFileSize := cFileInfo.Size()
+
+	compressionRatio := float64(oFileSize) / float64(cFileSize)
+
+	return compressionRatio
 }
 
 /* WriteEncodedRune(): Writes the binary encoding of each rune to the compressed file using
 * the BitWriter.
  */
-func WriteEncodedRune(code string, bitWriter *BitWriter) {
+func writeEncodedRune(code string, bitWriter *BitWriter) {
 	for i := 0; i < len(code); i++ {
 		if code[i] == '1' {
 			bitWriter.WriteBit(true)
@@ -144,7 +185,7 @@ func (e *Encoder) DecodeToDefaultOutputFile(inputFileName string) {
 
 	extension := path.Ext(inputFileName)
 	if extension != ".huff" {
-		log.Fatal("Can only decode .huff files")
+		log.Fatal("Can only decompress .huff files")
 	}
 	nameWithoutExtension := inputFileName[:len(inputFileName)-len(extension)]
 	outputFileName := nameWithoutExtension + "_decoded.txt"
@@ -187,6 +228,7 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 	writer := bufio.NewWriter(decodedFile)
 
 	//	Generate Code Map from printed code table on encoded file
+	println("Generating code map...")
 	e.codeMap = make(map[int]string)
 	scanner := bufio.NewScanner(encodedFile)
 	scanner.Scan()
@@ -208,6 +250,13 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 		last = word
 	}
 
+	//	Exit if code map (and thus the encoded file) is empty
+	if len(e.codeMap) == 0 {
+		println("Compressed file is empty.")
+		println("Decompression complete.")
+		return
+	}
+
 	//	Create Reversed Code Map for reverse lookups
 	e.reverseCodeMap = reverseMap(e.codeMap)
 
@@ -223,6 +272,7 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 	//	Read encoded file one bit at a time until a sequence of bits matches a code
 	//	in the code table. Once it does, write the corresponding rune to the
 	//	decoded .txt file and start again. This is done until EOF is reached.
+	println("Decoding file...")
 	var code string
 	for {
 
@@ -247,7 +297,7 @@ func Decode(inputFileName, outputFileName string, e *Encoder) {
 		}
 
 	}
-
+	println("Decoding complete.")
 }
 
 /* reverseMap(): Takes a map, returns the same map but in reverse. */
